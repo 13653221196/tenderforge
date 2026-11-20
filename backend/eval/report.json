@@ -1,0 +1,292 @@
+{
+  "version": "5.0",
+  "annotation": {
+    "source": "manual_starter_unreviewed",
+    "cases_file": "backend/eval/cases.jsonl",
+    "cases": 24,
+    "quality_cases": 10,
+    "substantive_cases": 7,
+    "reviewed": false,
+    "splits": [
+      "dev",
+      "holdout"
+    ],
+    "strata": [
+      "clean_normal",
+      "negative_deviation",
+      "no_response",
+      "numeric_grounding",
+      "placeholder",
+      "protected_clean",
+      "vague_promise"
+    ]
+  },
+  "metrics": {
+    "cases": 24,
+    "should_report": 16,
+    "true_positive": 16,
+    "false_negative": 0,
+    "false_positive": 0,
+    "total_reported": 21,
+    "recall": 1.0,
+    "false_positive_rate": 0.0,
+    "localization": 1.0
+  },
+  "targets": {
+    "recall": 0.9,
+    "false_positive_rate": 0.15,
+    "localization": 0.85
+  },
+  "passed": {
+    "recall": true,
+    "false_positive_rate": true,
+    "localization": true
+  },
+  "all_passed": true,
+  "layers": {
+    "rules": {
+      "passed": {
+        "recall": true,
+        "false_positive_rate": true,
+        "localization": true
+      },
+      "all_passed": true,
+      "by_stratum": {
+        "placeholder": {
+          "cases": 4,
+          "passed": 4,
+          "false_positives": 0
+        },
+        "negative_deviation": {
+          "cases": 4,
+          "passed": 4,
+          "false_positives": 0
+        },
+        "vague_promise": {
+          "cases": 4,
+          "passed": 4,
+          "false_positives": 0
+        },
+        "no_response": {
+          "cases": 4,
+          "passed": 4,
+          "false_positives": 0
+        },
+        "clean_normal": {
+          "cases": 4,
+          "passed": 4,
+          "false_positives": 0
+        },
+        "protected_clean": {
+          "cases": 2,
+          "passed": 2,
+          "false_positives": 0
+        },
+        "numeric_grounding": {
+          "cases": 2,
+          "passed": 2,
+          "false_positives": 0
+        }
+      },
+      "by_split": {
+        "dev": {
+          "cases": 17,
+          "passed": 17,
+          "false_positives": 0
+        },
+        "holdout": {
+          "cases": 7,
+          "passed": 7,
+          "false_positives": 0
+        }
+      },
+      "sample_misses": []
+    },
+    "grounding": {
+      "checks": {
+        "坐标可复原": true,
+        "命中带页码": true,
+        "命中带坐标": true,
+        "证据外数值被抓到": true,
+        "依据内数值不误报": true
+      },
+      "all_passed": true,
+      "unsupported_sample": [
+        "999 万元"
+      ],
+      "hits": 2
+    },
+    "trajectory": {
+      "status": "report_available",
+      "all_passed": true,
+      "model_live_verified": true,
+      "model_probe": {
+        "model_id": "1cc2cbfe19",
+        "ok": true,
+        "error": ""
+      },
+      "claim": "真实模型链路已跑通；生成质量仅完成自动硬指标与逐条实质响应自动启发式核查，无经专家复核的真实样本，仍不构成标书质量能力证明",
+      "checks": 29,
+      "degraded": [
+        "生成正文自动硬指标核查（如实报告，非及格线）",
+        "3 个项目影子运行（同源规则层）"
+      ]
+    },
+    "quality": {
+      "annotation": {
+        "source": "manual_starter_unreviewed",
+        "cases_file": "backend/eval/cases_quality.jsonl",
+        "cases": 10,
+        "reviewed": false,
+        "independence": "样本由本层开发者按业务写法构造，未由第三方专家标注，属同源自测",
+        "checks": [
+          "逐条响应词面覆盖",
+          "正文数值有据",
+          "无占位符与内部标注",
+          "章节不为空"
+        ]
+      },
+      "metrics": {
+        "cases": 10,
+        "defective": 6,
+        "detected": 6,
+        "missed": 0,
+        "false_positive_cases": 0,
+        "recall": 1.0,
+        "false_positive_rate": 0.0
+      },
+      "targets": {
+        "recall": 0.9,
+        "false_positive_rate": 0.15
+      },
+      "passed": {
+        "recall": true,
+        "false_positive_rate": true
+      },
+      "all_passed": true,
+      "by_stratum": {
+        "clean_normal": {
+          "cases": 3,
+          "passed": 3,
+          "false_positives": 0
+        },
+        "protected_clean": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "placeholder": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "numeric_grounding": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "empty_section": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "no_response": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "mixed": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        },
+        "internal_mark": {
+          "cases": 1,
+          "passed": 1,
+          "false_positives": 0
+        }
+      },
+      "sample_misses": [],
+      "scope": "生成正文的四项自动硬指标回归冒烟",
+      "claim": "只验证可自动核查的硬指标；词面覆盖不等于实质响应，不构成专家评标结论"
+    },
+    "substantive": {
+      "annotation": {
+        "source": "manual_starter_unreviewed",
+        "cases_file": "backend/eval/cases_substantive.jsonl",
+        "cases": 7,
+        "reviewed": false,
+        "independence": "开发者构造的起步集，未经专家标注，属同源自测",
+        "method": "词面命中 + 明确响应表述 + 要求数值逐字出现；不评语义与方案优劣"
+      },
+      "metrics": {
+        "cases": 5,
+        "passed": 5,
+        "agreement": 1.0,
+        "known_limitations": 2
+      },
+      "known_limitations": [
+        {
+          "id": "s2",
+          "note": "已知局限：把要求原句连响应词一起抄进正文，当前自动启发式仍可能判为已响应；业务上应判未响应。此条单列为未解决局限，不计入通过率",
+          "business_expect": null,
+          "auto_result": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "id": "s6",
+          "note": "已知局限：逐字照抄要求（连响应词一起抄）业务上应判未响应，当前自动启发式判为已响应；单列记录，不计入通过率",
+          "business_expect": [
+            false
+          ],
+          "auto_result": [
+            true
+          ]
+        }
+      ],
+      "sample_misses": [],
+      "all_passed": true,
+      "scope": "逐条实质响应自动启发式与评分项覆盖的回归冒烟",
+      "claim": "照抄要求仍可能被判为已响应；未经专家复核，不构成标书质量能力证明"
+    },
+    "controls": {
+      "checks": {
+        "人工修订优先且停用生效": true,
+        "要求表进入覆盖度/实质响应/评分项": true,
+        "占位符/无据数值章节被硬阻断": true,
+        "干净章节不被误阻断": true
+      },
+      "all_passed": true,
+      "error": "",
+      "scope": "配置与门禁契约的确定性回归，不含模型与真实标书",
+      "claim": "只验证人工修订优先生效、未达标章节会硬阻断，不构成能力证明"
+    }
+  },
+  "evidence": {
+    "fixtures_dir": "G:\\zhaobiao\\bidagent\\backend\\eval\\fixtures",
+    "real_samples": 0,
+    "desensitized": 0,
+    "annotation_complete": 0,
+    "expert_annotated": 0,
+    "gold_reviewed": false,
+    "baseline_report": "G:\\zhaobiao\\bidagent\\backend\\eval\\baseline_report.json",
+    "how_to": "python -m backend.eval.fixtures --import-tender <文件> --id <id> / --import-bid <文件> --id <id> → --annotate → 人工复核 → --baseline",
+    "claim": "尚无经专家复核的真实标书样本；所有分数仍为同源自测，不构成标书质量能力证明"
+  },
+  "sample_misses": [],
+  "scope": "确定性规则层 + 检索证据层 + 生成正文自动硬指标 + 逐条实质响应的回归冒烟；模型生成质量的文采 / 方案优劣 / 评分得分、OCR 准确率未覆盖",
+  "limitations": [
+    "样本为起步标注集，未经招投标领域专家复核，不能外推到真实标书",
+    "样本量小，按 stratum / split 的分数仅供参考，不构成统计结论",
+    "评分与规则实现解耦（看证据位置而非内部 code），但仍是同一套被测规则的回归测试",
+    "真实模型端到端链路见 trajectory 层 / e2e_live.py",
+    "质量层样本为开发者构造的起步集，未由第三方专家标注，属同源自测；词面覆盖不等于实质响应，文采 / 方案优劣 / 评分办法得分未覆盖",
+    "第 5 层逐条实质响应是自动启发式：连响应词一起照抄要求仍可能判为已响应，已单列为已知局限，不混入通过率",
+    "当前真实标书样本 0 份、脱敏 0 份、标注完成 0 份、经专家复核 0 份；能力证明口径不成立（--import-tender / --import-bid → --annotate → 人工复核 → --baseline）"
+  ],
+  "claim": "回归冒烟通过，不构成真实标书上的能力证明"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "real-001",
+  "source": "real",
+  "reviewed": false,
+  "reviewer": "",
+  "reviewed_at": "",
+  "tender": "（粘贴真实招标文件全文；未填则本样本不参与评测）",
+  "sections": [
+    {
+      "title": "（章节标题）",
+      "text": "（真实投标正文）"
+    }
+  ],
+  "sources": [],
+  "expect_fail": [],
+  "expect_substantive": [],
+  "expect_scoring": []
+}

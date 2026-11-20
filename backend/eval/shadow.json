@@ -1,0 +1,60 @@
+{
+  "projects": 3,
+  "target_projects": 3,
+  "sufficient_coverage": true,
+  "comparable_projects": 1,
+  "rows": [
+    {
+      "project": "[E2E临时验收]1109213147",
+      "project_id": "a69bc76c7d31",
+      "sections": 7,
+      "fresh_issues": 4,
+      "stored_issues": 0,
+      "other_source_issues": 0,
+      "has_baseline": false,
+      "same": 0,
+      "added": [
+        "招标要求未见响应"
+      ],
+      "removed": [],
+      "removed_refs": [],
+      "agreement": null
+    },
+    {
+      "project": "新建标书",
+      "project_id": "9318970cec5c",
+      "sections": 6,
+      "fresh_issues": 1,
+      "stored_issues": 0,
+      "other_source_issues": 0,
+      "has_baseline": false,
+      "same": 0,
+      "added": [
+        "「投标函及投标报价总说明」正文为空"
+      ],
+      "removed": [],
+      "removed_refs": [],
+      "agreement": null
+    },
+    {
+      "project": "智慧园区视频监控系统采购（演示）",
+      "project_id": "4d8b67253e3a",
+      "sections": 7,
+      "fresh_issues": 4,
+      "stored_issues": 5,
+      "other_source_issues": 9,
+      "has_baseline": true,
+      "same": 1,
+      "added": [],
+      "removed": [
+        "「五、资格证明与承诺文件」内容过少"
+      ],
+      "removed_refs": [
+        "未标注"
+      ],
+      "agreement": 0.5
+    }
+  ],
+  "passed": false,
+  "note": "影子运行只读：未写回检查结果、未改写章节、未导出文件。「stored_issues」为上一次体检留痕中的规则层结论；「other_source_issues」为模型复核 / 本地基座补充结论，不参与一致性判定。从未体检过的项目标 has_baseline=false、agreement=null，不判为不一致。有基线的项目出现差异，通常来自体检后正文被改写、人工采纳，或规则层调整后旧留痕尚未刷新（见 removed_refs）；供人工归因，不自动改写任何内容。覆盖达标只说明项目数够，comparable_projects 才是有基线、真正可比的数量。"
+}

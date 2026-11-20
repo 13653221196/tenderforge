@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>登录 · 标书智能体</title>
+<link rel="stylesheet" href="/login.css?v=20261110" />
+</head>
+<body>
+<div class="gate">
+  <div class="gate-left">
+    <div class="brand">
+      <div class="logo">标</div>
+      <div>
+        <div class="brand-title">标书智能体</div>
+        <div class="brand-sub">上传招标书，说一句要做什么，下载能交的投标书</div>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li><b>每家一个独立空间</b><span>项目、资料、知识库各存各的，互相看不到。</span></li>
+      <li><b>登录才能用</b><span>没有账号打不开任何接口，也不会消耗你的模型额度。</span></li>
+      <li><b>数据留在自己机器上</b><span>正文与附件只落在本机磁盘，只有调模型时才发必要片段。</span></li>
+    </ul>
+    <div class="gate-foot">忘记密码，或要加人：找本企业管理员在「设置 · 企业与成员」里开号。</div>
+  </div>
+
+  <div class="gate-right">
+    <div class="card">
+      <h1 id="ttl">登录</h1>
+      <p class="sub" id="sub">用企业管理员给你的账号登录。</p>
+
+      <form id="form" autocomplete="off">
+        <label class="lbl">账号</label>
+        <input type="text" id="username" autocomplete="username" placeholder="例如 zhangsan" required />
+        <div id="orgRow" hidden>
+          <label class="lbl">企业名称</label>
+          <input type="text" id="orgname" placeholder="例如 华辰智能科技" />
+        </div>
+        <label class="lbl">密码</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="至少 8 位" required />
+        <div id="pw2Row" hidden>
+          <label class="lbl">再输一次密码</label>
+          <input type="password" id="password2" autocomplete="new-password" />
+        </div>
+        <div class="err" id="err" hidden></div>
+        <button class="btn primary" type="submit" id="submit">登录</button>
+      </form>
+
+      <div class="switch" id="switch" hidden>
+        还没有企业账号？<a href="#" id="toRegister">注册一个新企业</a>
+      </div>
+      <div class="switch" id="switchBack" hidden>
+        已有账号？<a href="#" id="toLogin">回到登录</a>
+      </div>
+    </div>
+    <div class="tip">首次登录请用企业管理员给你的账号；忘记密码请找本企业管理员重置。</div>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let SIGNUP = false;
+
+function showErr(msg) {
+  const e = $('#err');
+  e.textContent = msg; e.hidden = !msg;
+}
+
+async function post(path, body) {
+  const r = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  let j = {};
+  try { j = await r.json(); } catch (_) { /* ignore */ }
+  if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : `请求失败 ${r.status}`);
+  return j;
+}
+
+function setMode(register) {
+  $('#ttl').textContent = register ? '注册企业' : '登录';
+  $('#sub').textContent = register
+    ? '注册后你就是这个企业的管理员，可以给同事开账号。'
+    : '用企业管理员给你的账号登录。';
+  $('#orgRow').hidden = !register;
+  $('#pw2Row').hidden = !register;
+  $('#submit').textContent = register ? '注册并登录' : '登录';
+  $('#switch').hidden = register || !SIGNUP;
+  $('#switchBack').hidden = !register;
+  $('#password').setAttribute('autocomplete', register ? 'new-password' : 'current-password');
+  showErr('');
+  $('#form').dataset.mode = register ? 'register' : 'login';
+}
+
+$('#toRegister').onclick = (e) => { e.preventDefault(); setMode(true); };
+$('#toLogin').onclick = (e) => { e.preventDefault(); setMode(false); };
+
+$('#form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#submit');
+  const username = $('#username').value.trim();
+  const password = $('#password').value;
+  const register = $('#form').dataset.mode === 'register';
+  showErr('');
+  if (register && password !== $('#password2').value) return showErr('两次输入的密码不一样');
+  btn.disabled = true; btn.textContent = register ? '注册中…' : '登录中…';
+  try {
+    if (register) {
+      await post('/api/auth/register', {
+        org: $('#orgname').value.trim(), username, password, name: username,
+      });
+    } else {
+      await post('/api/auth/login', { username, password });
+    }
+    location.replace('/');
+  } catch (err) {
+    showErr(err.message || '登录失败');
+    btn.disabled = false;
+    btn.textContent = register ? '注册并登录' : '登录';
+    $('#password').select();
+  }
+});
+
+(async function boot() {
+  try {
+    const me = await (await fetch('/api/auth/me')).json();
+    if (me && me.ok) { location.replace('/'); return; }
+    SIGNUP = !!(me && me.signup_open);
+  } catch (_) { /* 忽略：没连上就显示登录框 */ }
+  setMode(false);
+  $('#username').focus();
+})();
+</script>
+</body>
+</html>

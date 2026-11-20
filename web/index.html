@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>标书智能体</title>
+<link rel="stylesheet" href="/style.css?v=20261115c" />
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">标</div>
+    <div>
+      <div class="brand-title">标书智能体</div>
+      <div class="brand-sub">上传招标书，说一句要做什么，下载能交的投标书</div>
+    </div>
+  </div>
+  <div class="topright">
+    <span class="model-name" id="modelName">—</span>
+    <details class="adv-settings" id="advSettings">
+      <summary>模型与隐私</summary>
+      <div class="adv-pop">
+        <div class="adv-sec">
+          <div class="adv-cap">运行方式</div>
+          <div class="segmented" id="modeSwitch">
+            <button data-mode="demo" class="on">本地演示</button>
+            <button data-mode="live">AI 模型</button>
+          </div>
+        </div>
+        <div class="adv-sec">
+          <div class="adv-cap">当前模型</div>
+          <select id="modelSelect" class="model-select" title="切换 AI 模型"></select>
+          <div class="adv-meta"><span class="adv-dot" id="modelDot"></span><span id="modelMeta">—</span></div>
+        </div>
+        <div class="adv-foot">
+          <button class="adv-status" id="btnModels">管理模型</button>
+          <button class="adv-status" id="btnPrivacy" data-act="openPrivacy" title="数据外发设置">
+            <span class="adv-dot" id="netDot"></span><span id="netText">联网：—</span>
+          </button>
+        </div>
+        <div class="hint">模型可随时切换；关闭联网后全部只在本机处理。</div>
+      </div>
+    </details>
+    <details class="user-menu" id="userMenu">
+      <summary title="账号与企业">
+        <span class="avatar" id="userAvatar">·</span>
+        <span class="user-name" id="userName">—</span>
+      </summary>
+      <div class="user-pop">
+        <div class="user-org" id="userOrg">—</div>
+        <div class="user-meta"><span id="userTick">—</span></div>
+        <button class="btn mini" data-act="goto" data-tab="settings">企业与成员</button>
+        <a class="btn mini" href="/vue/home.html">新版首页</a>
+        <a class="btn mini" href="/vue/settings.html">新版设置</a>
+        <button class="btn mini" data-act="openManual">使用手册</button>
+        <button class="btn mini" data-act="logout">退出登录</button>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div id="privacyModal" class="modal-mask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div><b>隐私与联网</b><span class="desc">用 AI 模型时，部分内容会离开本机。首次使用请确认。</span></div>
+    </div>
+    <div class="modal-body">
+      <div class="card">
+        <h3>会发什么、不会发什么</h3>
+        <p class="desc">只发送完成当前任务必需的片段；身份证、银行账号、手机号、邮箱自动打码；<b>报价表、投标函、承诺函、资质章节的正文永不外发</b>。检查、判定、导出都在本机完成。</p>
+        <p class="desc">如果关闭外发，就不再调用 AI 模型，只用本地演示结果，零内容外发。</p>
+      </div>
+      <div class="row" style="align-items:center;gap:9px;flex-wrap:wrap">
+        <label class="hint" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="privacyScrub" checked style="width:auto" /> 自动脱敏敏感信息</label>
+        <label class="hint" style="display:flex;align-items:center;gap:5px">单次发送上限 <input type="number" id="privacyMax" value="12000" min="500" max="60000" style="width:92px" /> 字</label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" data-act="privacyAck" data-allow="1">知道了，允许联网</button>
+        <button class="btn" data-act="privacyAck" data-allow="0">不联网，只用本机</button>
+      </div>
+      <div class="row" style="margin-top:12px" id="privacyToggleRow" hidden>
+        <button class="btn mini" data-act="privacyToggle" id="privacyToggleBtn">关闭外发</button>
+        <button class="btn mini" data-act="closePrivacy">关闭面板</button>
+      </div>
+      <div class="hint" style="margin-top:10px" id="privacyNote">—</div>
+    </div>
+  </div>
+</div>
+
+<div id="modelModal" class="modal-mask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div><b>AI 模型</b><span class="desc">可以同时接多个模型、随时切换，也能给不同环节指定不同模型。密钥只存在本机。</span></div>
+      <button class="btn mini" data-act="closeModels">关闭</button>
+    </div>
+    <div id="modelBody" class="modal-body"></div>
+  </div>
+</div>
+
+<div id="locateModal" class="modal-mask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div><b>查看原文</b><span class="desc">回到上传文件的原页，核对后再决定采纳或忽略。</span></div>
+      <button class="btn mini" data-act="closeLocate">关闭</button>
+    </div>
+    <div class="modal-body" id="locateBody"></div>
+  </div>
+</div>
+
+<div id="evidenceModal" class="modal-mask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div><b>这段内容依据什么</b><span class="desc">写这一章时实际用到的资料片段，点「回跳原文」可核对。</span></div>
+      <button class="btn mini" data-act="closeEvidence">关闭</button>
+    </div>
+    <div class="modal-body" id="evidenceBody"></div>
+  </div>
+</div>
+
+<div id="exportModal" class="modal-mask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div><b>导出前检查</b><span class="desc">下面只是提醒，不会禁止下载。可以直接导出，也可以先回去改；导出的文件会记下这次的提醒，提交前仍要人工复核。</span></div>
+      <button class="btn mini" data-act="closeExportGate">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div id="exportGateBody"></div>
+      <div class="row" style="margin-top:12px;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" id="exportGateConfirmBtn" data-act="confirmExportGate">仍然导出</button>
+        <button class="btn mini" data-act="goFixChapter">先去修改</button>
+        <span class="hint" id="exportGateHint">提醒不影响下载</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="projectsModal" class="modal-mask" hidden>
+  <div class="modal pj-modal">
+    <div class="modal-head">
+      <div><b>全部项目</b><span class="desc">写完的可以整本收进知识库当范例；归档只是从左边收起来，数据一条不动；删除会连正文、资料和导出文件一起删掉，不能恢复。</span></div>
+      <button class="btn mini" data-act="closeProjects">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="pj-tools">
+        <input id="projQ" class="pj-search" placeholder="搜项目名" data-role="projQ" />
+        <div class="segmented" id="projFilter">
+          <button data-act="projFilter" data-filter="all" class="on">全部</button>
+          <button data-act="projFilter" data-filter="doing">进行中</button>
+          <button data-act="projFilter" data-filter="done">已完稿</button>
+          <button data-act="projFilter" data-filter="archived">已归档</button>
+        </div>
+        <span class="hint" id="projHint">—</span>
+      </div>
+      <div id="projectsBody" class="pj-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="uiDialog" class="modal-mask" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="modal-head"><div><b id="dlgTitle">请确认</b></div></div>
+    <div class="modal-body">
+      <div id="dlgText" class="dlg-text"></div>
+      <input id="dlgInput" type="text" hidden autocomplete="off" />
+      <div class="dlg-acts">
+        <button type="button" class="btn" id="dlgCancel">取消</button>
+        <button type="button" class="btn primary" id="dlgOk">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-head">
+      <span>投标项目</span>
+      <div class="side-head-acts">
+        <button class="btn mini" id="btnAllProjects" data-act="openProjects" title="全部项目：归档、收进知识库、删除">全部</button>
+        <button class="btn mini" id="btnNewProject">新建项目</button>
+      </div>
+    </div>
+    <div id="projectList" class="project-list"></div>
+    <div class="side-foot">
+      <details class="side-tech">
+        <summary>系统状态 <span class="hint">点开看细节</span></summary>
+        <div class="mini-title">工作方式</div>
+        <div class="engine">先看现状，自己决定步骤，逐步完成，回头复核</div>
+        <div class="engine">本地核查 + AI 写作 + 知识库依据</div>
+        <div class="engine dim" id="brainLine">—</div>
+        <div class="engine dim" id="frameworkLine">—</div>
+      </details>
+    </div>
+  </aside>
+
+  <main class="main">
+    <nav class="tabs">
+      <button class="tab on" data-tab="chat">开始</button>
+      <button class="tab" data-tab="materials">资料</button>
+      <button class="tab" data-tab="write">标书正文</button>
+      <button class="tab" data-tab="check">检查与交付</button>
+      <div class="more-wrap" id="moreWrap">
+        <button class="tab more-toggle" id="moreBtn" type="button">管理</button>
+        <div class="more-menu" id="moreMenu" hidden>
+          <div class="more-title">不常用的功能</div>
+          <button class="tab" data-tab="overview">进度与下一步</button>
+          <button class="tab" data-tab="requirements">招标要求表</button>
+          <button class="tab" data-tab="kb">知识库</button>
+          <button class="tab" data-tab="core" data-admin="1">运行记录（管理员）</button>
+          <button class="tab" data-tab="usage" data-admin="1">用量与审计（管理员）</button>
+          <button class="tab" data-tab="settings" data-admin="1">设置（管理员）</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content">
+      <section class="panel chat-panel on" id="tab-chat"></section>
+      <section class="panel" id="tab-overview"></section>
+      <section class="panel" id="tab-materials"></section>
+      <section class="panel" id="tab-kb"></section>
+      <section class="panel" id="tab-requirements"></section>
+      <section class="panel" id="tab-write"></section>
+      <section class="panel" id="tab-check"></section>
+      <section class="panel" id="tab-core"></section>
+      <section class="panel" id="tab-usage"></section>
+      <section class="panel" id="tab-settings"></section>
+    </div>
+  </main>
+</div>
+
+<input type="file" id="fileInput" hidden accept=".docx,.pdf,.xlsx,.csv,.txt,.md,.markdown" />
+<div id="toast" class="toast"></div>
+<script src="/app.js?v=20261117gate"></script>
+</body>
+</html>
