@@ -46,48 +46,76 @@ TenderForge（标书锻造）只站在投标人这一侧：不评标、不猜中
 
 TenderForge 把这些问题变成**可检查的项**，在导出前一次性摊开给你看。
 
+## 完整流程
+
+一次完整投标，五屏走完。截图取自系统内置的演示项目（虚构内容），装好就能照着点一遍。
+
+### ① 传招标文件，先看要点
+
 <p align="center">
-  <img src="assets/screens/04-check.png" alt="检查与交付" width="780">
+  <img src="assets/screens/02-materials.png" alt="资料" width="820">
 </p>
 
-<p align="center"><sub>一次检查出 19 条问题，逐条给出位置与原因：占位内容没删、★条款未响应、暗标里出现公司名、报价大小写不一致……每条都标着「未处理」，改完才消</sub></p>
+文件拖进去自动解析，先告诉你：**硬性要求 7 条、评分项 1 项、废标条款 3 条**。不用自己从 300 页里翻——翻漏一条★，前面写的全白费。
 
-## 界面一览
+### ② 定目录，逐章写正文
 
-从传招标文件到导出 Word，五个步骤各自对应一屏，不做成一个大表单。
+<p align="center">
+  <img src="assets/screens/03-write.png" alt="标书正文" width="820">
+</p>
+
+目录按招标文件的评分办法反推。**没确认目录之前不让写**（截图里那条黄提示就是门），确认后才解锁生成——避免写完 6 章才发现结构不对。左侧章节、右侧正文，顶部进度卡把「已写 / 待写 / 受保护手填」分开算，投标函、报价表这类需要人签字的章标成保护章，系统不代写。
+
+### ③ 检查：到底能不能交
+
+<p align="center">
+  <img src="assets/screens/04-check.png" alt="检查与交付" width="700">
+</p>
+
+一次跑出 19 条问题，顶上四个数是**必改项 15 / 高风险 15 / 未达标章 5 / 空章 5**。每条都带位置和原因：占位符没删、★条款正文里没响应、暗标里出现公司名、报价大小写对不上……改完才消。
+
+### ④ 导出前的门禁
+
+<p align="center">
+  <img src="assets/screens/05-export.png" alt="导出门禁" width="620">
+</p>
+
+点「导出 Word」**不会直接下载**。先把 29 项没解决的摊开——高风险 22 条、必改 16 条，逐条说明为什么过不去。要导出得点「我已知情，导出 Word」，并且导出的文件就叫 `知情草稿-xxx.docx`。门禁是提醒不是禁止，但没人能说「我不知道」。
+
+### ⑤ 交付留痕
+
+<p align="center">
+  <img src="assets/screens/06-files.png" alt="交付文件" width="820">
+</p>
+
+导出过哪个版本、什么时候、能不能回退，都有记录。改到第 8 版也不用猜哪版是最终稿。
+
+## 其它页面
 
 <table>
 <tr>
-<td width="50%"><img src="assets/screens/02-materials.png" alt="资料"></td>
-<td width="50%"><img src="assets/screens/03-write.png" alt="标书正文"></td>
+<td width="50%"><img src="assets/screens/07-requirements.png" alt="招标要求表"></td>
+<td width="50%"><img src="assets/screens/08-matrix.png" alt="逐条响应矩阵"></td>
 </tr>
 <tr>
-<td valign="top"><sub><b>① 资料</b><br>传完招标文件自动抽取：硬性要求几条、评分项几条、废标条款几条，先看全再动笔</sub></td>
-<td valign="top"><sub><b>② 标书正文</b><br>左侧目录、右侧正文，逐章生成随时改写；顶部进度卡显示已写 / 待写 / 受保护手填</sub></td>
+<td valign="top"><sub><b>招标要求表</b><br>自动抽出的逐条要求，按硬性 / 评分 / 交付物分组。抽取难免有漏，所以每条都能人工改、停用、补录，改过的不再标「自动」</sub></td>
+<td valign="top"><sub><b>逐条响应矩阵</b><br>每条要求都要有结论：已确认 / 不适用 / 待落实。「不适用」必须写理由，「已确认」能点开看证据</sub></td>
 </tr>
 <tr>
-<td colspan="2"><img src="assets/screens/05-requirements.png" alt="招标要求表"></td>
+<td><img src="assets/screens/09-models.png" alt="AI 模型"></td>
+<td><img src="assets/screens/10-kb.png" alt="知识库"></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><sub><b>③ 招标要求表</b>——自动从招标文件里抽出的逐条要求，按硬性 / 评分 / 交付物分组。抽取难免有漏，所以每一条都能人工改、停用、补录，改过的会标注来源不再是「自动」</sub></td>
-</tr>
-<tr>
-<td colspan="2"><img src="assets/screens/06-matrix.png" alt="逐条响应矩阵"></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><sub><b>④ 逐条响应矩阵</b>——每条要求都要有结论：已确认 / 不适用 / 待落实。「不适用」必须写理由，「已确认」可以点开看证据。落不到章节的要求会一直挂在「待落实」里，导不过去</sub></td>
-</tr>
-<tr>
-<td width="50%"><img src="assets/screens/07-models.png" alt="AI 模型"></td>
-<td width="50%"><img src="assets/screens/08-kb.png" alt="知识库"></td>
-</tr>
-<tr>
-<td valign="top"><sub><b>⑤ 模型自配</b><br>任意 OpenAI 兼容接口，可给规划 / 写作 / 复核 / 对话分别挂不同模型；密钥后端脱敏保存</sub></td>
+<td valign="top"><sub><b>模型自配</b><br>任意 OpenAI 兼容接口，可给规划 / 写作 / 复核 / 对话分别挂不同模型；密钥只在后端，界面脱敏</sub></td>
 <td valign="top"><sub><b>知识库</b><br>企业素材与标书范例，写作时按需引用，跨项目复用</sub></td>
 </tr>
+<tr>
+<td colspan="2"><img src="assets/screens/11-runtime.png" alt="运行与诊断"></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><sub><b>运行与诊断</b>——每次模型调用都有记录：时间、环节、谁调的、输入输出多少 token、耗时多久。费用和留痕都在这看</sub></td>
+</tr>
 </table>
-
-> 以上截图来自系统内置的演示项目（首次启动自动创建，内容为虚构），可直接点开对照。
 
 ## 核心功能
 
