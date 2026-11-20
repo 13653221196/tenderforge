@@ -267,13 +267,13 @@
     }
   },
   "evidence": {
-    "fixtures_dir": "G:\\zhaobiao\\bidagent\\backend\\eval\\fixtures",
+    "fixtures_dir": "backend/eval/fixtures",
     "real_samples": 0,
     "desensitized": 0,
     "annotation_complete": 0,
     "expert_annotated": 0,
     "gold_reviewed": false,
-    "baseline_report": "G:\\zhaobiao\\bidagent\\backend\\eval\\baseline_report.json",
+    "baseline_report": "backend/eval/baseline_report.json",
     "how_to": "python -m backend.eval.fixtures --import-tender <文件> --id <id> / --import-bid <文件> --id <id> → --annotate → 人工复核 → --baseline",
     "claim": "尚无经专家复核的真实标书样本；所有分数仍为同源自测，不构成标书质量能力证明"
   },

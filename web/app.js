@@ -1,4 +1,4 @@
-/* 标书智能体 · LangChain 版 前端（原生 JS，无构建步骤） */
+/* TenderForge · LangChain 版 前端（原生 JS，无构建步骤） */
 /* 只给企业管理员看的页签：普通成员看不到入口，直接改 URL 也会被挡回主流程。
    后端本来就有权限校验，这里只是不让一线写标员被配置台淹没。 */
 const ADMIN_TABS = new Set(['core', 'usage', 'settings']);

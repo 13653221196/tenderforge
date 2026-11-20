@@ -407,7 +407,7 @@ def init_auth() -> dict:
     note = DATA_DIR / "初始管理员.txt"
     try:
         note.write_text(
-            "标书智能体 · 初始管理员\n"
+            "TenderForge · 初始管理员\n"
             "====================\n"
             f"企业：{name}\n账号：admin\n密码：{pwd}\n\n"
             "登录后请到「设置 · 企业与成员」改掉密码，并给同事开账号。\n"

@@ -40,7 +40,7 @@ def _sweep_samples() -> None:
 
 _sweep_samples()
 
-app = FastAPI(title="标书智能体 · LangChain 版", version="1.0")
+app = FastAPI(title="TenderForge · LangChain 版", version="1.0")
 
 COOKIE = "ba_session"
 # 免登录：探活、登录注册本身；其余 /api 一律要求登录

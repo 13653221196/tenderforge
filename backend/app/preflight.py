@@ -188,7 +188,7 @@ def _probe_model(base: str, key: str) -> tuple[bool, str]:
 
 def main() -> int:
     print("=" * 60)
-    print("标书智能体 · 启动前自检")
+    print("TenderForge · 启动前自检")
     print("=" * 60)
     print(f"解释器：{sys.executable}")
     print("依赖安装：python -m pip install -r backend/requirements.txt（务必用上面这个解释器）")

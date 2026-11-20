@@ -15,7 +15,7 @@ if "%UV_ARGS%"=="" (
 )
 
 echo ============================================
-echo   标书智能体
+echo   TenderForge · 标书锻造
 echo   启动后浏览器打开 %APP_URL%
 echo ============================================
 python -m backend.app.preflight

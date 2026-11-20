@@ -302,7 +302,7 @@ def drill(path: Path, *, report: Path | None = None, root: Path | None = None) -
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="标书智能体：备份 / 隔离恢复 / 恢复演练")
+    ap = argparse.ArgumentParser(description="TenderForge：备份 / 隔离恢复 / 恢复演练")
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("create", help="生成一致性备份包")
     c.add_argument("--out", default="", help="备份包输出目录，默认当前目录")

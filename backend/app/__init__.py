@@ -1,1 +1,1 @@
-"""标书智能体 · LangChain 版"""
+"""TenderForge · LangChain 版"""

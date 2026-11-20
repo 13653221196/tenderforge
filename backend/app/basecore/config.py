@@ -20,8 +20,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-APP_NAME = "标书智能体"
-APP_SUBTITLE = "投标文件智能编制工作台"
+APP_NAME = "TenderForge"
+APP_SUBTITLE = "标书锻造 · 投标文件智能编制工作台"
 APP_VERSION = "0.2.0"
 
 ROOT = Path(__file__).resolve().parents[3]

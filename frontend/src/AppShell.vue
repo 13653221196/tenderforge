@@ -84,7 +84,7 @@ function openLegacy(tab) {
       <a class="side-brand" :href="homeLink">
         <div class="logo">标</div>
         <div>
-          <div class="side-title">标书智能体</div>
+          <div class="side-title">TenderForge</div>
           <div class="side-sub">新版</div>
         </div>
       </a>
