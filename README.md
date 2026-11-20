@@ -1,5 +1,12 @@
 # 标书智能体 · BidAgent
 
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-2ea44f.svg" alt="License: MIT">
+  <img src="https://img.shields.io/badge/python-3.10%2B-3776ab.svg" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/deploy-self--hosted-e36209.svg" alt="Self-hosted">
+  <img src="https://img.shields.io/badge/model-OpenAI%20compatible-6b4fbb.svg" alt="OpenAI compatible">
+</p>
+
 **把一份招标文件变成一本能交的投标文件。** 本地部署、数据不出机器、全流程留痕。
 
 招标文件上传 → 自动解读评分点 → 定目录 → 逐章写正文 → 「能不能交」体检 → 导出 Word。
@@ -54,10 +61,14 @@ BidAgent 把这些问题变成**可检查的项**，在导出前一次性摊开�
 ## 快速开始
 
 ```bash
-# 1. 装依赖（Python 3.10+）
+# 1. 获取代码
+git clone https://github.com/13653221196/bidagent.git
+cd bidagent
+
+# 2. 装依赖（Python 3.10+）
 pip install -r backend/requirements.txt
 
-# 2. 启动
+# 3. 启动
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 5210
 ```
 
