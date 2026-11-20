@@ -12,8 +12,10 @@
 招标文件上传 → 自动解读评分点 → 定目录 → 逐章写正文 → 「能不能交」体检 → 导出 Word。
 
 <p align="center">
-  <img src="ui-preview.png" alt="界面预览" width="820">
+  <img src="assets/screens/01-home.png" alt="TenderForge 首页" width="860">
 </p>
+
+<p align="center"><sub>首页：当前项目进度、三个入口、项目列表 —— 从传文件到导出，一眼看到走到哪一步</sub></p>
 
 ---
 
@@ -43,6 +45,49 @@ TenderForge（标书锻造）只站在投标人这一侧：不评标、不猜中
 - 改到第 8 版，已经不知道哪版是最终稿。
 
 TenderForge 把这些问题变成**可检查的项**，在导出前一次性摊开给你看。
+
+<p align="center">
+  <img src="assets/screens/04-check.png" alt="检查与交付" width="780">
+</p>
+
+<p align="center"><sub>一次检查出 19 条问题，逐条给出位置与原因：占位内容没删、★条款未响应、暗标里出现公司名、报价大小写不一致……每条都标着「未处理」，改完才消</sub></p>
+
+## 界面一览
+
+从传招标文件到导出 Word，五个步骤各自对应一屏，不做成一个大表单。
+
+<table>
+<tr>
+<td width="50%"><img src="assets/screens/02-materials.png" alt="资料"></td>
+<td width="50%"><img src="assets/screens/03-write.png" alt="标书正文"></td>
+</tr>
+<tr>
+<td valign="top"><sub><b>① 资料</b><br>传完招标文件自动抽取：硬性要求几条、评分项几条、废标条款几条，先看全再动笔</sub></td>
+<td valign="top"><sub><b>② 标书正文</b><br>左侧目录、右侧正文，逐章生成随时改写；顶部进度卡显示已写 / 待写 / 受保护手填</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="assets/screens/05-requirements.png" alt="招标要求表"></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><sub><b>③ 招标要求表</b>——自动从招标文件里抽出的逐条要求，按硬性 / 评分 / 交付物分组。抽取难免有漏，所以每一条都能人工改、停用、补录，改过的会标注来源不再是「自动」</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="assets/screens/06-matrix.png" alt="逐条响应矩阵"></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><sub><b>④ 逐条响应矩阵</b>——每条要求都要有结论：已确认 / 不适用 / 待落实。「不适用」必须写理由，「已确认」可以点开看证据。落不到章节的要求会一直挂在「待落实」里，导不过去</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/screens/07-models.png" alt="AI 模型"></td>
+<td width="50%"><img src="assets/screens/08-kb.png" alt="知识库"></td>
+</tr>
+<tr>
+<td valign="top"><sub><b>⑤ 模型自配</b><br>任意 OpenAI 兼容接口，可给规划 / 写作 / 复核 / 对话分别挂不同模型；密钥后端脱敏保存</sub></td>
+<td valign="top"><sub><b>知识库</b><br>企业素材与标书范例，写作时按需引用，跨项目复用</sub></td>
+</tr>
+</table>
+
+> 以上截图来自系统内置的演示项目（首次启动自动创建，内容为虚构），可直接点开对照。
 
 ## 核心功能
 
@@ -120,9 +165,11 @@ LLM_MODEL=deepseek-chat
 
 ## 技术栈
 
-Python 3.10+ / FastAPI / SQLite（WAL）/ 原生 JS 前端（无构建步骤）/ python-docx / PyMuPDF / LangChain（可选）。
+Python 3.10+ / FastAPI / SQLite（WAL）/ Vue 3 前端（已预构建，开箱即用）/ python-docx / PyMuPDF / LangChain（可选）。
 
-单进程、单端口、零外部依赖即可运行，不需要 Redis、不需要 Node。
+单进程、单端口、零外部依赖即可运行，不需要 Redis、不需要 Node —— 前端构建产物已随仓库提供，改样式才需要 Node。
+
+界面有两套：`/vue/home.html` 是重构版（上方截图），`/` 是早期原生 JS 版，功能一致，后者保留作为对照。
 
 ## 免责声明
 
