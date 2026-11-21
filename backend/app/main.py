@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from . import (access, agent, auth, auto_core, brain, chains, chat, config, core_bridge,
                delivery, docx_export, emb_bridge, facts, forms, guard, parsers, quality,
                rag, reqmatrix, reqtable, rules, samples, seed, settings, store, tender,
-               blindcheck, bidbundle, readiness, scope, taskctl)
+               blindcheck, bidbundle, readiness, scope, taskctl, profile)
 from . import generation_context, requirement_support
 
 store.init_db()
@@ -531,6 +531,23 @@ def models_delete(mid: str) -> dict:
 def new_project(body: dict) -> dict:
     name = str(_body(body, "name", "")).strip() or "未命名投标项目"
     return store.create_project(name, str(_body(body, "tender_text", "")))
+
+
+@app.get("/api/projects/{pid}/profile")
+def get_project_profile(pid: str) -> dict:
+    """项目手填资料：企业基本信息、资质、业绩、团队、设备、参数承诺、售后。"""
+    _need_project(pid)
+    return profile.get(pid)
+
+
+@app.put("/api/projects/{pid}/profile")
+def put_project_profile(pid: str, body: dict) -> dict:
+    """保存手填资料。存成项目资料（kb_docs），目录 / 单章 / 整本生成直接引用。"""
+    _need_project(pid)
+    values = _body(body, "values", None)
+    if not isinstance(values, dict):
+        values = body if isinstance(body, dict) else {}
+    return profile.save(pid, values)
 
 
 @app.get("/api/projects")

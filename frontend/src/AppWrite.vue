@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, gotoPage } from './api'
 import AppShell from './AppShell.vue'
 
@@ -14,12 +14,17 @@ const projects = ref([])
 const pid = ref('')
 const project = ref(null)
 const plan = ref({})
+const profile = ref({ filled: 0, total: 0, values: {}, fields: [] })
+const profileOpen = ref(false)
+const profileForm = ref({})
+const profileSaving = ref(false)
 const loading = ref(true)
 const error = ref('')
 const selectedId = ref('')
 const job = ref(null)
 const jobId = ref('')
 const busy = ref(false)
+const outlineBusy = ref(false)
 const editing = ref(false)
 const draftText = ref('')
 const saving = ref(false)
@@ -28,6 +33,7 @@ const conflict = ref(null)
 const aiBrief = ref('')
 const aiBusy = ref(false)
 let timer = null
+let tick = 0
 
 const sections = computed(() => project.value?.sections || [])
 const written = computed(() => sections.value.filter((s) => String(s.text || '').trim()).length)
@@ -101,9 +107,9 @@ const unmatched = computed(() => (plan.value?.unmatched_scoring || []).filter((x
 
 const next = computed(() => {
   const p = project.value
-  if (!p) return { step: 3, level: 'warn', title: '正在加载项目', desc: '稍等…', action: '稍等', tab: 'write' }
+  if (!p) return { step: 3, level: 'warn', title: '正在加载项目', desc: '稍等…', action: '稍等', act: 'none' }
   if (!sections.value.length) {
-    return { step: 3, level: 'warn', title: '还没有目录', desc: '先按招标文件生成目录，再来逐章写。', action: '生成目录', tab: 'write' }
+    return { step: 3, level: 'warn', title: '还没有目录', desc: '按招标文件里的投标格式和评分办法排章，通常 1—3 分钟。', action: '生成目录', act: 'outline' }
   }
   if (!String(p.outline_confirmed_at || '').trim()) {
     return { step: 3, level: 'warn', title: '目录还没确认', desc: '确认后才能写正文；改目录后需要重新确认。', action: '确认目录', act: 'confirm' }
@@ -121,7 +127,7 @@ const next = computed(() => {
     }
   }
   if (emptyProt.value) {
-    return { step: 3, level: 'warn', title: `还有 ${emptyProt.value} 章保护内容要手填`, desc: '投标函、报价表等只能人工填原件，系统不代写。', action: '填写这一章', tab: 'write' }
+    return { step: 3, level: 'warn', title: `还有 ${emptyProt.value} 章保护内容要手填`, desc: '投标函、报价表等只能人工填原件，系统不代写。', action: '填写这一章', act: 'fillProt' }
   }
   return { step: 4, level: 'ok', title: '正文齐了', desc: '下一步检查资格、评分、废标，再导出。', action: '去检查', tab: 'check' }
 })
@@ -154,12 +160,15 @@ async function loadAll() {
   loading.value = true
   error.value = ''
   try {
-    const [p, pl] = await Promise.all([
+    const [p, pl, pf] = await Promise.all([
       api(`/api/projects/${pid.value}`),
       api(`/api/projects/${pid.value}/outline/plan`).catch(() => ({})),
+      api(`/api/projects/${pid.value}/profile`)
+        .catch(() => ({ filled: 0, total: 0, values: {}, fields: [] })),
     ])
     project.value = p
     plan.value = pl || {}
+    profile.value = pf || { filled: 0, total: 0, values: {}, fields: [] }
     const url = new URL(location.href)
     url.searchParams.set('pid', pid.value)
     history.replaceState(null, '', url)
@@ -167,6 +176,62 @@ async function loadAll() {
     error.value = e.message
   } finally {
     loading.value = false
+  }
+}
+
+function openProfile() {
+  profileForm.value = { ...(profile.value.values || {}) }
+  error.value = ''
+  profileOpen.value = true
+}
+
+async function saveProfile() {
+  if (profileSaving.value) return
+  profileSaving.value = true
+  error.value = ''
+  try {
+    const r = await api(`/api/projects/${pid.value}/profile`,
+      { method: 'PUT', body: { values: profileForm.value } })
+    profile.value = { ...(profile.value || {}), ...(r || {}) }
+    profileOpen.value = false
+    notice.value = r?.filled
+      ? `已保存项目资料（${r.filled}/${r.total} 项），写正文时会引用`
+      : '项目资料已清空'
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    profileSaving.value = false
+  }
+}
+
+/** 写正文前提醒一次：没有资料时 AI 只能凭招标文件写，企业信息会写成空话。 */
+function warnNoProfile(action) {
+  if (profile.value.filled) return false
+  const go = window.confirm(
+    `还没有填「项目资料」。${action}时 AI 只能凭招标文件写，`
+    + '企业名称、资质、业绩、团队会写成空泛表述。\n\n'
+    + '点「确定」现在去填写；点「取消」仍按现有资料继续。')
+  if (go) {
+    openProfile()
+    return true
+  }
+  return false
+}
+
+async function makeOutline() {
+  if (busy.value) return
+  busy.value = true
+  outlineBusy.value = true
+  error.value = ''
+  try {
+    // 同步接口：模型要读完招标文件再排目录，通常几十秒到两三分钟
+    await api(`/api/projects/${pid.value}/outline`, { method: 'POST', body: {} })
+    await loadAll()
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    busy.value = false
+    outlineBusy.value = false
   }
 }
 
@@ -186,11 +251,13 @@ async function confirmOutline() {
 
 async function compose() {
   if (busy.value) return
+  if (warnNoProfile('一键写整本')) return
   busy.value = true
   error.value = ''
   try {
     const r = await api(`/api/projects/${pid.value}/jobs/compose`, { method: 'POST', body: { overwrite: false } })
     jobId.value = r.job_id || ''
+    tick = 0
     job.value = { status: r.status || 'queued', progress: r.progress || 0, step: r.step || '排队中' }
     if (jobId.value) poll()
     else {
@@ -208,6 +275,10 @@ async function poll() {
     const j = await api(`/api/jobs/${jobId.value}`)
     job.value = j
     if (j.status === 'queued' || j.status === 'running') {
+      // 整本生成要跑几十分钟，只在结束时刷新会让人以为一章都没写进去：
+      // 每 10 次轮询（约 12 秒）顺带刷一次章节列表，让「已写 N 章」跟着进度走。
+      tick += 1
+      if (tick % 10 === 0) loadAll().catch(() => {})
       timer = setTimeout(poll, 1200)
       return
     }
@@ -254,6 +325,7 @@ function cancelEdit() {
 async function aiWrite() {
   const s = selected.value
   if (!s || aiBusy.value) return
+  if (warnNoProfile('生成这一章')) return
   const brief = aiBrief.value.trim()
   if (!brief) {
     error.value = '先写一句你想要的这一章内容，比如要包含哪些点、什么口径'
@@ -333,10 +405,23 @@ async function saveEdit(force = false) {
   }
 }
 
+function fillFirstProtected() {
+  const s = sections.value.find((x) => x.protected && !String(x.text || '').trim())
+  if (!s) return
+  selectedId.value = s.id
+  startEdit()
+  nextTick(() => {
+    const el = document.querySelector('.preview textarea')
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' })
+  })
+}
+
 function goNext() {
   const n = next.value
+  if (n.act === 'outline') return makeOutline()
   if (n.act === 'confirm') return confirmOutline()
   if (n.act === 'compose') return compose()
+  if (n.act === 'fillProt') return fillFirstProtected()
   if (n.act === 'none') return
   gotoPage(n.tab, pid.value)
 }
@@ -364,8 +449,33 @@ onBeforeUnmount(stopPoll)
             <b>{{ next.title }}</b>
             <div class="hint">{{ next.desc }}</div>
           </div>
-          <button class="btn primary" :disabled="busy" @click="goNext">{{ next.action }}</button>
+          <button class="btn primary" :disabled="busy" @click="goNext">
+            {{ outlineBusy ? '正在排目录…' : next.action }}
+          </button>
         </div>
+
+        <div v-if="outlineBusy" class="notice">
+          <span class="spin"></span>
+          正在读招标文件，按投标格式和评分办法排章。通常 1—3 分钟，请不要关闭页面——生成完目录会自动显示在下面。
+        </div>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>项目资料</h2>
+            <span class="chip" :class="{ ok: profile.filled }">
+              {{ profile.filled }}/{{ profile.total || 9 }} 项已填
+            </span>
+            <span class="grow"></span>
+            <button class="btn" @click="openProfile">{{ profile.filled ? '修改资料' : '填写资料' }}</button>
+          </div>
+          <p class="hint">
+            填企业资质、业绩、团队、设备、参数承诺。生成目录、单章、整本都会先读这里，把真实信息写进对应章节；
+            没填的部分 AI 只能凭招标文件写，容易写成空泛表述。
+          </p>
+          <p v-if="!profile.filled" class="hint" style="color:#92400e;margin-top:8px">
+            还没有填。先填 5 分钟，比写完再改 5 小时划算。
+          </p>
+        </section>
 
         <section class="card">
           <div class="card-head">
@@ -404,7 +514,10 @@ onBeforeUnmount(stopPoll)
             <span class="hint">点左边任意一章，右边预览，右侧可直接改字。</span>
           </div>
           <div v-if="!sections.length" class="empty">
-            还没有目录。先按招标文件生成目录。
+            <p>还没有目录。先按招标文件生成目录，再来逐章写。</p>
+            <button class="btn primary" :disabled="busy" @click="makeOutline">
+              {{ busy ? '正在按招标文件生成…' : '按招标文件生成目录' }}
+            </button>
           </div>
           <div v-else class="split">
             <aside class="chap-pane">
@@ -463,7 +576,13 @@ onBeforeUnmount(stopPoll)
                   <div v-if="!selected.protected" class="ai-box">
                     <div class="ai-head">
                       <b>AI 按你的描述写这一章</b>
-                      <span class="hint">写清要包含的内容和口径，AI 直接写进这一章（可回退）</span>
+                      <span class="hint">
+                        写清要包含的内容和口径，AI 直接写进这一章（可回退）；
+                        会自动引用「项目资料」里已填的 {{ profile.filled }} 项
+                        <template v-if="!profile.filled">
+                          —— 还没填，<a href="#" @click.prevent="openProfile">现在填</a>
+                        </template>
+                      </span>
                     </div>
                     <textarea
                       v-model="aiBrief"
@@ -475,6 +594,7 @@ onBeforeUnmount(stopPoll)
                       <button class="btn primary" :disabled="aiBusy" @click="aiWrite">
                         {{ aiBusy ? 'AI 正在写，可能要 1—2 分钟…' : (selectedWords ? '按描述改写这一章' : '按描述生成这一章') }}
                       </button>
+                      <button class="btn" :disabled="aiBusy" @click="openProfile">看 / 改项目资料</button>
                       <span class="hint">不写描述也可以，直接在下面手动改。</span>
                     </div>
                   </div>
@@ -541,5 +661,44 @@ onBeforeUnmount(stopPoll)
           </div>
         </details>
       </template>
+
+      <div v-if="profileOpen" class="modal-mask" @click.self="profileOpen = false">
+        <div class="modal">
+          <div class="modal-head">
+            <div>
+              <b>项目资料</b>
+              <div class="hint">按实填写；空着的字段不会写进正文，也不会被 AI 编出来。</div>
+            </div>
+            <button class="btn" @click="profileOpen = false">关闭</button>
+          </div>
+          <div class="modal-body">
+            <div v-for="f in profile.fields" :key="f.key" class="pfield">
+              <label :for="'pf-' + f.key">
+                {{ f.label }}
+                <span class="hint">{{ f.hint }}</span>
+              </label>
+              <textarea
+                v-if="f.multiline"
+                :id="'pf-' + f.key"
+                v-model="profileForm[f.key]"
+                rows="3"
+                :placeholder="'每行一条'"
+              ></textarea>
+              <input
+                v-else
+                :id="'pf-' + f.key"
+                v-model="profileForm[f.key]"
+                placeholder=""
+              />
+            </div>
+            <div class="preview-acts" style="margin-top:14px">
+              <button class="btn primary" :disabled="profileSaving" @click="saveProfile">
+                {{ profileSaving ? '保存中…' : '保存资料' }}
+              </button>
+              <span class="hint">多行字段每行写一条，AI 按行拆开引用。</span>
+            </div>
+          </div>
+        </div>
+      </div>
   </AppShell>
 </template>

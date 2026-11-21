@@ -265,9 +265,20 @@ def retrieve(pid: str, query: str, k: int = 4) -> tuple[str, list[dict[str, Any]
     return "\n\n".join(lines), hits
 
 
+PROFILE_TITLE = "企业资料（手填）"
+
+
 def materials_block(pid: str) -> str:
-    """本项目我提供的资料：生成时优先级最高的事实依据。"""
+    """本项目我提供的资料：生成时优先级最高的事实依据。
+
+    手填的企业资料排在最前并给足字数——它是投标人自己写的事实，
+    长度通常在两三千字，截到 900 字会把团队、业绩后半段直接丢掉。
+    """
     rows = store.list_docs(scope="project", project_id=pid, usable_only=True)
     if not rows:
         return "（未上传本项目资料）"
-    return "\n\n".join(f"【{r['title']}】\n{r['content'][:900]}" for r in rows)
+    head = [r for r in rows if str(r.get("title") or "") == PROFILE_TITLE]
+    rest = [r for r in rows if str(r.get("title") or "") != PROFILE_TITLE]
+    parts = [f"【{r['title']}】\n{r['content'][:2600]}" for r in head]
+    parts += [f"【{r['title']}】\n{r['content'][:900]}" for r in rest]
+    return "\n\n".join(parts)
