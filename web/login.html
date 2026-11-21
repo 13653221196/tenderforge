@@ -114,7 +114,7 @@ $('#form').addEventListener('submit', async (e) => {
     } else {
       await post('/api/auth/login', { username, password });
     }
-    location.replace('/');
+    location.replace('/vue/home.html');
   } catch (err) {
     showErr(err.message || '登录失败');
     btn.disabled = false;
@@ -126,7 +126,7 @@ $('#form').addEventListener('submit', async (e) => {
 (async function boot() {
   try {
     const me = await (await fetch('/api/auth/me')).json();
-    if (me && me.ok) { location.replace('/'); return; }
+    if (me && me.ok) { location.replace('/vue/home.html'); return; }
     SIGNUP = !!(me && me.signup_open);
   } catch (_) { /* 忽略：没连上就显示登录框 */ }
   setMode(false);

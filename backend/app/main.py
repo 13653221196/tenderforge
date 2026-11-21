@@ -46,6 +46,10 @@ COOKIE = "ba_session"
 # 免登录：探活、登录注册本身；其余 /api 一律要求登录
 PUBLIC_API = {"/api/health", "/api/auth/login", "/api/auth/register", "/api/auth/me"}
 
+# 首页入口：/ 统一进新版 Vue 界面；旧外壳保留在 /index.html，需要时可直接访问
+ENTRY_PAGE = "/vue/home.html"
+LEGACY_PAGE = "/index.html"
+
 
 def _token_of(request: Request) -> str:
     tk = request.cookies.get(COOKIE) or ""
@@ -62,10 +66,15 @@ async def auth_guard(request: Request, call_next):
     path = request.url.path
     if not path.startswith("/api/"):
         # 页面：没登录就先去登录页；静态资源本身不拦（拿不到它页面也渲染不出来）
-        if path in ("/", "/index.html"):
+        is_page = (path in ("/", LEGACY_PAGE)
+                   or (path.startswith("/vue/") and path.endswith(".html")))
+        if is_page:
             user = auth.resolve(_token_of(request))
             if not user:
                 return RedirectResponse("/login.html", 302)
+            if path == "/":
+                # 默认落新版界面；旧外壳退到 /index.html 备用
+                return RedirectResponse(ENTRY_PAGE, 302)
         return await call_next(request)
     if path in PUBLIC_API:
         return await call_next(request)
@@ -89,8 +98,10 @@ async def auth_guard(request: Request, call_next):
 async def no_cache_web_assets(request, call_next):
     """界面文件每次都取最新的：避免改了 CSS/JS 浏览器还用旧缓存，样式看起来像乱码。"""
     response = await call_next(request)
-    if request.url.path in ("/", "/index.html", "/style.css", "/app.js",
-                            "/login.html", "/login.css", "/login.js", "/manual.html"):
+    p = request.url.path
+    if p in ("/", "/index.html", "/style.css", "/app.js",
+             "/login.html", "/login.css", "/login.js", "/manual.html") \
+            or (p.startswith("/vue/") and p.endswith(".html")):
         response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
         response.headers["Pragma"] = "no-cache"
     return response
