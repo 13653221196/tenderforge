@@ -11,6 +11,8 @@
 
 招标文件上传 → 自动解读评分点 → 定目录 → 逐章写正文 → 「能不能交」体检 → 导出 Word。
 
+> **English** — TenderForge is a self-hosted **AI bid writer and tender document generator**. Feed it a tender document / RFP / bid invitation, and it extracts the scoring criteria, builds the response outline, drafts every chapter, then runs a compliance check for disqualification risks, anonymous-bid name leaks and price-figure mismatches before exporting a submission-ready **Word** file. Works with any OpenAI-compatible model: GPT, Claude, Gemini, Codex, DeepSeek, Qwen, GLM, MiniMax. 标书自动生成 · 投标文件编制 · 招标文件解读 · 评分点提取 · 技术方案写作 · 废标风险检查 · 暗标检查。
+
 <p align="center">
   <img src="assets/screens/01-home.png" alt="TenderForge 首页" width="860">
 </p>
@@ -240,3 +242,7 @@ Python 3.10+ / FastAPI / SQLite（WAL）/ Vue 3 前端（已预构建，开箱�
 ## License
 
 [MIT](LICENSE)
+
+---
+
+<sub>关键词 / Keywords：AI 标书生成 · 标书自动生成 · 投标文件生成 · 招标文件解读 · 投标文件编制 · 评分点提取 · 技术方案自动写作 · 商务标 · 废标风险检查 · 暗标检查 · 报价大小写核对 · 投标文件体检 · Word 导出 ｜ AI bid writer · tender document generator · bid document automation · RFP response generator · proposal writing · tender management · bid compliance check · self-hosted LLM agent · FastAPI · ChatGPT / Claude / DeepSeek / Qwen</sub>
