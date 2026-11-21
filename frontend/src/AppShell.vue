@@ -42,10 +42,6 @@ const NAV = [
       { key: 'runtime', label: '运行与诊断', page: 'runtime' },
     ],
   },
-  {
-    group: '其他',
-    items: [{ key: 'legacy-chat', label: '对话式操作（旧版）', legacy: 'chat' }],
-  },
 ]
 
 const homeLink = computed(() => props.pid
@@ -68,14 +64,6 @@ function onPid(e) {
   emit('update:pid', v)
   emit('change', v)
 }
-
-function openLegacy(tab) {
-  try {
-    const old = JSON.parse(localStorage.getItem('bidagent.ui.v1') || '{}') || {}
-    localStorage.setItem('bidagent.ui.v1', JSON.stringify({ ...old, pid: props.pid || old.pid || '', tab }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
 </script>
 
 <template>
@@ -85,19 +73,15 @@ function openLegacy(tab) {
         <div class="logo">标</div>
         <div>
           <div class="side-title">TenderForge</div>
-          <div class="side-sub">新版</div>
+          <div class="side-sub">投标文件工作台</div>
         </div>
       </a>
       <nav class="side-nav">
         <div v-for="g in NAV" :key="g.group" class="nav-group">
           <div class="nav-title">{{ g.group }}</div>
-          <template v-for="it in g.items" :key="it.key">
-            <button v-if="it.legacy" class="nav-item" type="button" @click="openLegacy(it.legacy)">{{ it.label }}</button>
-            <a v-else class="nav-item" :class="{ on: it.key === page }" :href="link(it)">{{ it.label }}</a>
-          </template>
+          <a v-for="it in g.items" :key="it.key" class="nav-item" :class="{ on: it.key === page }" :href="link(it)">{{ it.label }}</a>
         </div>
       </nav>
-      <div class="side-foot"><a href="/">返回旧版</a></div>
     </aside>
 
     <div class="shell-main">

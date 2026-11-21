@@ -157,22 +157,6 @@ function sectionTitle(id) {
   return sectionMap.value[id] || id || ''
 }
 
-function gotoOldSection(sid) {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab: 'write', ['sec:' + pid.value]: sid || '' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
-function gotoOldMatrix() {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab: 'requirements' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 onMounted(boot)
 </script>
 
@@ -210,7 +194,7 @@ onMounted(boot)
             <h2>要求清单</h2>
             <div class="row">
               <button class="btn mini" :disabled="busy" @click="genCandidates">生成候选关联</button>
-              <button class="btn mini" @click="gotoOldMatrix">去旧版补材料 / 改关联</button>
+              <a class="btn mini" :href="`/vue/requirements.html?pid=${encodeURIComponent(pid)}`">去要求表改关联</a>
             </div>
           </div>
           <div class="kb-tabs" style="margin-top:12px">
@@ -245,7 +229,7 @@ onMounted(boot)
                   <button class="btn mini" :disabled="busy || !it.evidence_ok || it.status === 'confirmed' || it.status === 'na'" @click="confirmItem(it)">确认已落实</button>
                   <button class="btn mini" :disabled="busy || it.status === 'na'" @click="openNa(it)">标不适用</button>
                   <button class="btn mini" @click="toggleDetail(it.id)">{{ expanded === it.id ? '收起证据' : '看证据 / 缺口' }}</button>
-                  <button v-if="it.section_id" class="btn mini" @click="gotoOldSection(it.section_id)">去这一章改</button>
+                  <a v-if="it.section_id" class="btn mini" :href="`/vue/write.html?pid=${encodeURIComponent(pid)}`">去这一章改</a>
                 </div>
                 <div v-if="expanded === it.id" class="req-detail">
                   <div v-if="(it.support_gaps || []).length">
@@ -258,7 +242,7 @@ onMounted(boot)
                       <li v-for="(l, i) in it.support_links" :key="i">{{ l.target_type }} · {{ l.target_id }} · {{ l.relation }}</li>
                     </ul>
                   </div>
-                  <p class="hint">补材料、改关联、附件核验仍在旧版操作；这里只做逐条结论。</p>
+                  <p class="hint">这里只做逐条结论；补材料去「资料」页，改关联去「招标要求表」。</p>
                 </div>
               </div>
             </div>

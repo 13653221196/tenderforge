@@ -147,14 +147,6 @@ function fmtDate(s) {
   return String(s || '').slice(0, 10)
 }
 
-function gotoOld() {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab: 'kb' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 onMounted(boot)
 </script>
 
@@ -197,7 +189,7 @@ onMounted(boot)
 
       <div v-if="loading && !docs.length" class="card muted">正在加载…</div>
       <div v-else-if="!filtered.length" class="card empty">
-        {{ docs.length ? '没有符合条件的条目，换个词或切到「全部」。' : '知识库还是空的。新建一篇，或回旧版把写好的标书收进知识库。' }}
+        {{ docs.length ? '没有符合条件的条目，换个词或切到「全部」。' : '知识库还是空的。点上面「新建」存一篇，或从已写完的标书里收进来。' }}
       </div>
 
       <section v-for="d in filtered" :key="d.id" class="kb-item">
@@ -249,7 +241,7 @@ onMounted(boot)
       </section>
 
       <p class="hint" style="text-align:center">
-        需要「用它建目录 / 设为参照」？回旧版知识库操作。
+        需要「用它建目录 / 设为参照」？在「标书正文」里选素材即可。
       </p>
   </AppShell>
 </template>

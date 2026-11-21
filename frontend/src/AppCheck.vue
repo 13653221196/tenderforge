@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { api } from './api'
+import { api, gotoPage } from './api'
 import AppShell from './AppShell.vue'
 
 const UI_KEY = 'bidagent.ui.v1'
@@ -157,19 +157,11 @@ async function doExport() {
   }
 }
 
-function gotoOld(tab = 'check') {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 function goNext() {
   const n = next.value
   if (n.act === 'recheck') return recheck()
   if (n.act === 'export') return openExport()
-  gotoOld('write')
+  gotoPage('write', pid.value)
 }
 
 onMounted(boot)
@@ -186,7 +178,7 @@ onMounted(boot)
       <div v-if="error" class="notice bad">{{ error }}</div>
       <div v-if="toast" class="notice ok">{{ toast }}</div>
       <div v-if="loading && !project" class="card muted">正在加载…</div>
-      <div v-else-if="!pid" class="card">还没有项目。请回旧版新建项目后再来。</div>
+      <div v-else-if="!pid" class="card">还没有项目。先去首页新建一个。</div>
 
       <template v-else-if="project">
         <div class="next" :class="next.level">
@@ -218,7 +210,7 @@ onMounted(boot)
             <button class="btn" :disabled="checking" @click="recheck">{{ checking ? '检查中…' : '重新检查' }}</button>
             <button class="btn primary" :disabled="gateLoading" @click="openExport">{{ gateLoading ? '正在核对…' : '导出 Word' }}</button>
             <a class="btn" :href="`/vue/files.html?pid=${encodeURIComponent(pid)}`">产出文件</a>
-            <button class="btn" @click="gotoOld('write')">回正文手动改</button>
+            <a class="btn" :href="`/vue/write.html?pid=${encodeURIComponent(pid)}`">回正文手动改</a>
             <span class="grow"></span>
             <span class="hint">{{ readiness?.hint || '导出时会再核一次。' }}</span>
           </div>
@@ -241,7 +233,7 @@ onMounted(boot)
               </div>
               <span class="hint">{{ c.status === 'accepted' ? '已采纳' : c.status === 'ignored' ? '已忽略' : '未处理' }}</span>
             </div>
-            <div v-if="checks.length > 20" class="hint">还有 {{ checks.length - 20 }} 条，回旧版查看全部。</div>
+            <div v-if="checks.length > 20" class="hint">还有 {{ checks.length - 20 }} 条未列出，可先去处理上面的。</div>
           </div>
         </section>
 
@@ -287,7 +279,7 @@ onMounted(boot)
               </div>
             </div>
             <div v-if="(gate?.issues?.length || 0) > gateIssues.length" class="hint">
-              还有 {{ gate.issues.length - gateIssues.length }} 项，回旧版查看全部。
+              还有 {{ gate.issues.length - gateIssues.length }} 项未列出。
             </div>
           </div>
           <div v-else class="empty">没有导出提醒，可以直接导出。</div>

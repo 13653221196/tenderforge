@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { api } from './api'
+import { api, gotoPage } from './api'
 import AppShell from './AppShell.vue'
 
 const UI_KEY = 'bidagent.ui.v1'
@@ -48,7 +48,7 @@ const tenderParseNote = computed(() => {
   if (!t) return ''
   if (t.needs_review && !t.confirmed_at) {
     const pages = (t.unread_pages || []).slice(0, 12).join('、')
-    return `有页面没识别${pages ? `（第 ${pages} 页）` : ''}，已标“待核对”。回旧版确认后才进入依据池。`
+    return `有页面没识别${pages ? `（第 ${pages} 页）` : ''}，已标“待核对”。在「资料」页核对后才进入依据池。`
   }
   if (t.ocr_pages) return `${t.ocr_pages} 页由本地 OCR 识别，页码可回跳。`
   return ''
@@ -61,23 +61,23 @@ const next = computed(() => {
     return { step: 1, level: 'warn', title: '还没有招标文件', desc: '先上传，系统才能抽要求、排目录。', action: '选择文件', pick: true }
   }
   if (pendingCount.value > 0) {
-    return { step: 2, level: 'warn', title: `有 ${pendingCount.value} 份资料待核对`, desc: '未核对的内容不会进入依据池；核对后再往下走。', action: '回旧版核对', tab: 'materials' }
+    return { step: 2, level: 'warn', title: `有 ${pendingCount.value} 份资料待核对`, desc: '未核对的内容不会进入依据池；核对后再往下走。', action: '去资料页核对', tab: 'materials' }
   }
   if (!(brief.value?.requirements?.total > 0)) {
-    return { step: 2, level: 'warn', title: '还没抽出招标要求', desc: '回旧版点一次“提取要求”，再回来看要点。', action: '回旧版提取', tab: 'materials' }
+    return { step: 2, level: 'warn', title: '还没抽出招标要求', desc: '去「招标要求表」点一次“从招标文件重抽”，再回来看要点。', action: '去要求表重抽', tab: 'materials' }
   }
   const secs = p.sections || []
   if (!secs.length) {
-    return { step: 3, level: 'warn', title: '要点已就绪，还没生成目录', desc: '回旧版“标书正文”生成目录，再逐章写。', action: '回旧版生成目录', tab: 'write' }
+    return { step: 3, level: 'warn', title: '要点已就绪，还没生成目录', desc: '去「标书正文」按招标文件生成目录，再逐章写。', action: '去生成目录', tab: 'write' }
   }
   const wrote = secs.filter((s) => String(s.text || '').trim()).length
   if (!wrote) {
-    return { step: 3, level: 'warn', title: `目录有 ${secs.length} 章，还没开始写`, desc: '回旧版点“一键写整本”，或逐章写。', action: '回旧版写标书', tab: 'write' }
+    return { step: 3, level: 'warn', title: `目录有 ${secs.length} 章，还没开始写`, desc: '去「标书正文」一键写整本，或逐章写。', action: '去写标书', tab: 'write' }
   }
   if (wrote < secs.length) {
-    return { step: 3, level: 'ok', title: `已写 ${wrote}/${secs.length} 章`, desc: '还有章节没写，写完再去检查。', action: '回旧版继续写', tab: 'write' }
+    return { step: 3, level: 'ok', title: `已写 ${wrote}/${secs.length} 章`, desc: '还有章节没写，写完再去检查。', action: '继续写正文', tab: 'write' }
   }
-  return { step: 4, level: 'ok', title: `${secs.length} 章都写了`, desc: '下一步检查资格、评分、废标，再导出。', action: '回旧版检查导出', tab: 'check' }
+  return { step: 4, level: 'ok', title: `${secs.length} 章都写了`, desc: '下一步检查资格、评分、废标，再导出。', action: '去检查导出', tab: 'check' }
 })
 
 async function boot() {
@@ -165,17 +165,9 @@ async function upload(file) {
   }
 }
 
-function gotoOld(tab) {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab: tab || 'materials' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 function goNext() {
   if (next.value.pick) return pick()
-  gotoOld(next.value.tab)
+  gotoPage(next.value.tab, pid.value)
 }
 
 onMounted(boot)
@@ -191,7 +183,7 @@ onMounted(boot)
 
       <div v-if="error" class="notice bad">{{ error }}</div>
       <div v-if="loading && !project" class="card muted">正在加载…</div>
-      <div v-else-if="!pid" class="card">还没有项目。请回旧版新建项目后再来。</div>
+      <div v-else-if="!pid" class="card">还没有项目。先去首页新建一个。</div>
 
       <template v-else-if="project">
         <div class="next" :class="next.level">

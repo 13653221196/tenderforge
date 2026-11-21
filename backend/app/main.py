@@ -72,8 +72,8 @@ async def auth_guard(request: Request, call_next):
             user = auth.resolve(_token_of(request))
             if not user:
                 return RedirectResponse("/login.html", 302)
-            if path == "/":
-                # 默认落新版界面；旧外壳退到 /index.html 备用
+            if path in ("/", LEGACY_PAGE):
+                # 只走新版界面；旧外壳不再对外提供（文件仍留在磁盘，回滚用）
                 return RedirectResponse(ENTRY_PAGE, 302)
         return await call_next(request)
     if path in PUBLIC_API:

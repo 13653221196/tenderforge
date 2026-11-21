@@ -1,9 +1,8 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { api } from './api'
+import { api, gotoPage } from './api'
 import AppShell from './AppShell.vue'
 
-const UI_KEY = 'bidagent.ui.v1'
 const STEPS = [
   { n: 1, label: '传文件' },
   { n: 2, label: '看要点' },
@@ -104,7 +103,7 @@ const next = computed(() => {
   const p = project.value
   if (!p) return { step: 3, level: 'warn', title: '正在加载项目', desc: '稍等…', action: '稍等', tab: 'write' }
   if (!sections.value.length) {
-    return { step: 3, level: 'warn', title: '还没有目录', desc: '回旧版按招标文件生成目录，再来写。', action: '回旧版生成目录', tab: 'write' }
+    return { step: 3, level: 'warn', title: '还没有目录', desc: '先按招标文件生成目录，再来逐章写。', action: '生成目录', tab: 'write' }
   }
   if (!String(p.outline_confirmed_at || '').trim()) {
     return { step: 3, level: 'warn', title: '目录还没确认', desc: '确认后才能写正文；改目录后需要重新确认。', action: '确认目录', act: 'confirm' }
@@ -122,9 +121,9 @@ const next = computed(() => {
     }
   }
   if (emptyProt.value) {
-    return { step: 3, level: 'warn', title: `还有 ${emptyProt.value} 章保护内容要手填`, desc: '投标函、报价表等只能人工填原件，系统不代写。', action: '回旧版手填', tab: 'write' }
+    return { step: 3, level: 'warn', title: `还有 ${emptyProt.value} 章保护内容要手填`, desc: '投标函、报价表等只能人工填原件，系统不代写。', action: '填写这一章', tab: 'write' }
   }
-  return { step: 4, level: 'ok', title: '正文齐了', desc: '下一步检查资格、评分、废标，再导出。', action: '回旧版检查', tab: 'check' }
+  return { step: 4, level: 'ok', title: '正文齐了', desc: '下一步检查资格、评分、废标，再导出。', action: '去检查', tab: 'check' }
 })
 
 watch(sections, (list) => {
@@ -334,22 +333,12 @@ async function saveEdit(force = false) {
   }
 }
 
-function gotoOld(tab, sid = '') {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    const patch = { ...old, pid: pid.value, tab: tab || 'write' }
-    if (sid) patch['sec:' + pid.value] = sid
-    localStorage.setItem(UI_KEY, JSON.stringify(patch))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 function goNext() {
   const n = next.value
   if (n.act === 'confirm') return confirmOutline()
   if (n.act === 'compose') return compose()
   if (n.act === 'none') return
-  gotoOld(n.tab)
+  gotoPage(n.tab, pid.value)
 }
 
 onMounted(boot)
@@ -367,7 +356,7 @@ onBeforeUnmount(stopPoll)
       <div v-if="error" class="notice bad">{{ error }}</div>
       <div v-if="notice" class="notice ok">{{ notice }}</div>
       <div v-if="loading && !project" class="card muted">正在加载…</div>
-      <div v-else-if="!pid" class="card">还没有项目。请回旧版新建项目后再来。</div>
+      <div v-else-if="!pid" class="card">还没有项目。先去首页新建一个。</div>
 
       <template v-else-if="project">
         <div class="next" :class="next.level">
@@ -399,7 +388,7 @@ onBeforeUnmount(stopPoll)
             </div>
             <div class="bar"><i :style="{ width: wordPct + '%' }" :class="{ low: wordPct < 60 }"></i></div>
             <div v-if="wordPct < 60 && written" class="hint">
-              偏短：预算 {{ totalBudget }} 字，实际 {{ totalWords }} 字。可回旧版把偏短的章重新生成。
+              偏短：预算 {{ totalBudget }} 字，实际 {{ totalWords }} 字。可把偏短的章重新生成。
             </div>
           </div>
 
@@ -412,10 +401,10 @@ onBeforeUnmount(stopPoll)
         <section class="card">
           <div class="card-head">
             <h2>目录与正文</h2>
-            <span class="hint">点左边任意一章，右边预览；改字回旧版。</span>
+            <span class="hint">点左边任意一章，右边预览，右侧可直接改字。</span>
           </div>
           <div v-if="!sections.length" class="empty">
-            还没有目录。请回旧版按招标文件生成目录后再来。
+            还没有目录。先按招标文件生成目录。
           </div>
           <div v-else class="split">
             <aside class="chap-pane">
@@ -453,7 +442,7 @@ onBeforeUnmount(stopPoll)
                         保护章节：请人工填写原件内容，系统不代写。
                       </template>
                       <template v-else>
-                        {{ previewText ? `预览${tableCount ? ` · 含 ${tableCount} 个表格` : ''}` : '这一章还没写，可以直接写或回旧版生成。' }}
+                        {{ previewText ? `预览${tableCount ? ` · 含 ${tableCount} 个表格` : ''}` : '这一章还没写，可以直接写，也可以让它生成。' }}
                       </template>
                     </div>
                   </div>
@@ -463,7 +452,6 @@ onBeforeUnmount(stopPoll)
                       <button class="btn primary" :disabled="saving || aiBusy" @click="saveEdit(false)">{{ saving ? '保存中…' : '保存' }}</button>
                     </template>
                     <template v-else>
-                      <button class="btn" @click="gotoOld('write', selected.id)">旧版高级编辑</button>
                       <button class="btn primary" @click="startEdit">
                         {{ selected.protected ? '填写这一章' : (selectedWords ? '编辑 / AI 写这一章' : '写这一章') }}
                       </button>
@@ -547,7 +535,7 @@ onBeforeUnmount(stopPoll)
               <ul class="lines">
                 <li v-for="(n, i) in unmatched.slice(0, 30)" :key="i">{{ n }}</li>
               </ul>
-              <p class="hint">可能漏了得分点，也可能已并入相关章节，请逐条核对；需要补章可回旧版操作。</p>
+              <p class="hint">可能漏了得分点，也可能已并入相关章节，请逐条核对；需要补章请先在「招标要求表」里对齐。</p>
             </template>
             <p v-else class="hint" style="margin-top:12px">没有发现未匹配的评分项。</p>
           </div>

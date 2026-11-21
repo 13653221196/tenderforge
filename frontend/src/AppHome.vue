@@ -93,10 +93,6 @@ async function create() {
   }
 }
 
-function goOld() {
-  location.href = '/'
-}
-
 function go() {
   const n = next.value
   if (n.act === 'new') {
@@ -187,7 +183,6 @@ onMounted(boot)
       <p class="hint" style="text-align:center">
         需要逐条改要求？<a :href="`/vue/requirements.html?pid=${encodeURIComponent(pid)}`" style="color:var(--primary)">打开招标要求表</a>
         · 公司素材？<a href="/vue/kb.html" style="color:var(--primary)">打开知识库</a>
-        · 需要对话式操作？<a href="/" style="color:var(--primary)">打开旧版对话</a>
       </p>
   </AppShell>
 </template>

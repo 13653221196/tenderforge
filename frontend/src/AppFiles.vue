@@ -101,14 +101,6 @@ function fmt(s) {
   return String(s || '').slice(0, 16).replace('T', ' ')
 }
 
-function gotoOld() {
-  try {
-    const old = JSON.parse(localStorage.getItem('bidagent.ui.v1') || '{}') || {}
-    localStorage.setItem('bidagent.ui.v1', JSON.stringify({ ...old, pid: pid.value, tab: 'check' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 onMounted(boot)
 </script>
 

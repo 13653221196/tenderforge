@@ -223,22 +223,11 @@ function saveBudget() {
   }), '预算设置已保存')
 }
 
-function gotoOld() {
-  try {
-    const old = JSON.parse(localStorage.getItem('bidagent.ui.v1') || '{}') || {}
-    localStorage.setItem('bidagent.ui.v1', JSON.stringify({ ...old, tab: 'settings' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 onMounted(boot)
 </script>
 
 <template>
   <AppShell :page="pageKey" :title="activeTabLabel" subtitle="企业、成员、模型、联网与预算" :show-project="false">
-    <template #actions>
-      <button class="btn" @click="gotoOld">返回旧版</button>
-    </template>
 
     <div v-if="error" class="notice bad">{{ error }}</div>
     <div v-if="toast" class="notice ok">{{ toast }}</div>

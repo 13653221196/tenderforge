@@ -137,14 +137,6 @@ function add() {
   }, '已加入要求表')
 }
 
-function gotoOld() {
-  try {
-    const old = JSON.parse(localStorage.getItem(UI_KEY) || '{}') || {}
-    localStorage.setItem(UI_KEY, JSON.stringify({ ...old, pid: pid.value, tab: 'requirements' }))
-  } catch { /* 忽略本地存储异常 */ }
-  location.href = '/'
-}
-
 onMounted(boot)
 </script>
 
@@ -173,9 +165,9 @@ onMounted(boot)
             <button class="btn" :disabled="busy" @click="sync(false)">从招标文件重抽</button>
             <button class="btn" :disabled="busy" @click="sync(true)">恢复被删要求</button>
             <a class="btn" :href="`/vue/reqmatrix.html?pid=${encodeURIComponent(pid)}`">逐条响应矩阵</a>
-            <button class="btn" @click="gotoOld">去旧版补材料</button>
+            <a class="btn" :href="`/vue/materials.html?pid=${encodeURIComponent(pid)}`">去资料页补材料</a>
             <span class="grow"></span>
-            <span class="hint">新增/删除关联、附件核验仍在旧版。</span>
+            <span class="hint">新增/删除关联、附件核验在「资料」页做。</span>
           </div>
         </section>
 

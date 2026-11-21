@@ -241,7 +241,7 @@ onMounted(boot)
             <h2>自动基座</h2>
             <span class="chip" :class="auto.enabled ? 'ok' : 'warn'">{{ auto.enabled ? '自动执行中' : '已关闭' }}</span>
           </div>
-          <p class="desc">导入、成稿、体检、导出前后会自动跑一组本地校验；这里只读展示，开关在旧版设置。</p>
+          <p class="desc">导入、成稿、体检、导出前后会自动跑一组本地校验；这里只读展示，开关在「AI 模型」与「联网与预算」里。</p>
           <div class="req-list">
             <div v-for="s in auto.stages || []" :key="s.key" class="req-row">
               <div class="req-main">

@@ -28,3 +28,23 @@ export async function api(path, { method = 'GET', body, form } = {}) {
   }
   return data
 }
+
+/** 界面内部跳页：tab 用内部叫法，落点是 /vue/<page>.html */
+const PAGE_OF = {
+  home: 'home',
+  materials: 'materials',
+  write: 'write',
+  check: 'check',
+  requirements: 'requirements',
+  reqmatrix: 'reqmatrix',
+  kb: 'kb',
+  files: 'files',
+  runtime: 'runtime',
+  settings: 'settings',
+}
+
+export function gotoPage(tab = 'home', pid = '') {
+  const page = PAGE_OF[tab] || 'home'
+  const q = pid ? `?pid=${encodeURIComponent(pid)}` : ''
+  location.href = `/vue/${page}.html${q}`
+}
