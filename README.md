@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/model-OpenAI%20compatible-6b4fbb.svg" alt="OpenAI compatible">
 </p>
 
-**把一份招标文件变成一本能交的投标文件。** 本地部署、数据不出机器、全流程留痕。
+**AI 标书生成工具 · 标书智能体** —— 把一份招标文件变成一本能交的投标文件。本地部署、数据不出机器、全流程留痕。
 
 招标文件上传 → 自动解读评分点 → 定目录 → 逐章写正文 → 「能不能交」体检 → 导出 Word。
 
